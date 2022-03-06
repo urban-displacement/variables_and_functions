@@ -1077,14 +1077,14 @@ census00 <- census00 %>% select(-NAME) %>%
          renterp = renter_count/hh_count,
          ownerp = owner_count/hh_count,
          built_1990_1999 = built_1990_1994 + built_1995_1998 + built_1999_2000,
-         below_hs = (male_below_hs_1 + male_below_hs_2 + male_below_hs_3 + male_below_hs_4 +
+         below_hs = 100*(male_below_hs_1 + male_below_hs_2 + male_below_hs_3 + male_below_hs_4 +
                        male_below_hs_5 + male_below_hs_6 + male_below_hs_7 + male_below_hs_8 +
                        female_below_hs_1 + female_below_hs_2 + female_below_hs_3 + female_below_hs_4 +
-                       female_below_hs_5 + female_below_hs_6 + female_below_hs_7 + female_below_hs_8),
-         highschool = totpop25over - below_hs,
-         ba_higher = male_ba + male_ma + male_psd + male_phd +
-           female_ba + female_ma + female_psd + female_phd,
-         ma_higher = male_ma + male_psd + male_phd + female_ma + female_psd + female_phd,
+                       female_below_hs_5 + female_below_hs_6 + female_below_hs_7 + female_below_hs_8)/totpop25over,
+         highschool = 100*(totpop25over - below_hs)/totpop25over,
+         ba_higher = 100*(male_ba + male_ma + male_psd + male_phd +
+           female_ba + female_ma + female_psd + female_phd)/totpop25over,
+         ma_higher = 100*(male_ma + male_psd + male_phd + female_ma + female_psd + female_phd)/totpop25over,
          unemployment = 100*(unemployment_1 + unemployment_2)/unemployment_base,
          rentocc_rentburden_less20k = rentocc_rentburden_less20k_1 + rentocc_rentburden_less20k_2,
          rentocc_rentburden_20k_35k = rentocc_rentburden_20k_35k_1 + rentocc_rentburden_20k_35k_2,
@@ -1157,7 +1157,6 @@ full <- full %>%
 full_percent <- full %>% select(GEOID, variable, `2019`) %>%
     pivot_wider(names_from = "variable", values_from = "2019") %>%
     mutate_at(vars(amind, asian, black, latinx, other, white, pacis, race2, white), ~100*./population) %>%
-    mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
     mutate_at(vars(matches("built"), -built_median, matches("h_units"), -matches("h_units_w_")), ~100*./total_units) %>%
     mutate_at(vars(matches("w_mortgage")), ~100*./owner_count) %>%
     mutate_at(vars(matches("income_") & matches("_Asian")), ~100*./hh_Asian) %>%
