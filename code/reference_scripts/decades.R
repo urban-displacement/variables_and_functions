@@ -1169,7 +1169,6 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
     full %>% select(GEOID, variable, `2010`) %>%
       pivot_wider(names_from = "variable", values_from = "2010") %>%
       mutate_at(vars(amind, asian, black, latinx, other, white, pacis, race2, white), ~100*./population) %>%
-      mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
       mutate_at(vars(matches("built"), -built_median, matches("h_units"), -matches("h_units_w_")), ~100*./total_units) %>%
       mutate_at(vars(matches("w_mortgage")), ~100*./owner_count) %>%
       mutate_at(vars(matches("income_") & matches("_Asian")), ~100*./hh_Asian) %>%
@@ -1188,7 +1187,6 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
     full %>% select(GEOID, variable, `2000`) %>%
       pivot_wider(names_from = "variable", values_from = "2000") %>%
       mutate_at(vars(amind, asian, black, latinx, other, white, pacis, race2, white), ~100*./population) %>%
-      mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
       mutate_at(vars(matches("built"), -built_median, matches("h_units"), -matches("h_units_w_")), ~100*./total_units) %>%
       mutate_at(vars(matches("w_mortgage")), ~100*./owner_count) %>%
       mutate_at(vars(matches("income_") & matches("_Asian")), ~100*./hh_Asian) %>%
