@@ -41,7 +41,9 @@ tenure_vars_19 <-c(
   "homeval_lower_quartile" = "B25076_001",
   "homeval_med" = "B25077_001",
   "homeval_upper_quartile" = "B25078_001",
-  "totalunits" ="B25034_001",
+  "total_units" = "B25002_001",
+  "occupied_units" = "B25002_002",
+  "vacant_units" = "B25002_003",
   "built_2014_on" = "B25034_002",
   "built_2010_2013"="B25034_003",
   "built_2000_2009"="B25034_004",
@@ -187,11 +189,35 @@ income_vars_19 <- c(
   "rentocc_rentburden_75kmore" = "B25106_044",
   "med_rent" = "B25064_001",
   "med_rent_percent_income" = "B25071_001",
+  "rent_0_100" = "B25063_003",
+  "rent_100_150" = "B25063_004",
+  "rent_150_200" = "B25063_005",
+  "rent_200_250" = "B25063_006",
+  "rent_250_300" = "B25063_007",
+  "rent_300_350" = "B25063_008",
+  "rent_350_400" = "B25063_009",
+  "rent_400_450" = "B25063_010",
+  "rent_450_500" = "B25063_011",
+  "rent_500_550" = "B25063_012",
+  "rent_550_600" = "B25063_013",
+  "rent_600_650" = "B25063_014",
+  "rent_650_700" = "B25063_015",
+  "rent_700_750" = "B25063_016",
+  "rent_750_800" = "B25063_017",
+  "rent_800_900" = "B25063_018",
+  "rent_900_1000" = "B25063_019",
+  "rent_1000_1250" = "B25063_020",
+  "rent_1250_1500" = "B25063_021",
+  "rent_1500_2000" = "B25063_022",
+  "rent_2000_2500" = "B25063_023",
+  "rent_2500_3000" = "B25063_024",
+  "rent_3000_3500" = "B25063_025",
+  "rent_3500_more" = "B25063_026",
   "rent_burden_1" = "B25070_007",
   "rent_burden_2" = "B25070_008",
   "rent_burden_3" = "B25070_009",
   "rent_burden_4" = "B25070_010",
-  "poverty_rate" = "S1703_C03_001",
+  "poverty_rate" = "S1701_C03_001",
   "unemployment" = "S2301_C04_001",
   "welfare" = "B19057_002",
   "h_units_w_mortgage_30_35perc" = "B25091_008",
@@ -218,7 +244,7 @@ hh_vars_19 <- c(
 )
 
 edu_vars_19 <- c(
-  "totpop25over" = "S1501_C02_006",
+  "totpop25over" = "B15002_001",
   "below_hs_1" = "S1501_C02_007",
   "below_hs_2" = "S1501_C02_008",
   "highschool" = "S1501_C02_009",
@@ -258,7 +284,9 @@ tenure_vars_10 <-c(
   "homeval_lower_quartile" = "B25076_001",
   "homeval_med" = "B25077_001",
   "homeval_upper_quartile" = "B25078_001",
-  "totalunits" ="B25034_001",
+  "total_units" = "B25002_001",
+  "occupied_units" = "B25002_002",
+  "vacant_units" = "B25002_003",
   "built_2005_on" = "B25034_002",
   "built_2000_2004" = "B25034_003",
   "built_1990_1999"="B25034_004",
@@ -409,6 +437,27 @@ income_vars_10 <- c(
   "rentocc_rentburden_75kmore" = "B25106_044",
   "med_rent" = "B25064_001",
   "med_rent_percent_income" = "B25071_001",
+  "rent_0_100" = "B25063_003",
+  "rent_100_150" = "B25063_004",
+  "rent_150_200" = "B25063_005",
+  "rent_200_250" = "B25063_006",
+  "rent_250_300" = "B25063_007",
+  "rent_300_350" = "B25063_008",
+  "rent_350_400" = "B25063_009",
+  "rent_400_450" = "B25063_010",
+  "rent_450_500" = "B25063_011",
+  "rent_500_550" = "B25063_012",
+  "rent_550_600" = "B25063_013",
+  "rent_600_650" = "B25063_014",
+  "rent_650_700" = "B25063_015",
+  "rent_700_750" = "B25063_016",
+  "rent_750_800" = "B25063_017",
+  "rent_800_900" = "B25063_018",
+  "rent_900_1000" = "B25063_019",
+  "rent_1000_1250" = "B25063_020",
+  "rent_1250_1500" = "B25063_021",
+  "rent_1500_2000" = "B25063_022",
+  "rent_2000_more" = "B25063_023",
   "rent_burden_1" = "B25070_007",
   "rent_burden_2" = "B25070_008",
   "rent_burden_3" = "B25070_009",
@@ -484,7 +533,9 @@ tenure_vars_00_sf3 <- c(
   "homeval_lower_quartile" = "H075001",
   "homeval_med" = "H076001",
   "homeval_upper_quartile" = "H077001",
-  "totalunits" = "H001001",
+  "total_units" = "H006001",
+  "occupied_units" = "H006002",
+  "vacant_units" = "H006003",
   "built_1999_2000" = "H034002",
   "built_1995_1998" = "H034003",
   "built_1990_1994" = "H034004",
@@ -639,6 +690,27 @@ burden_vars_00 <- c(
   "rentocc_rentburden_100kmore_2" = "H073049",
   "med_rent" = "H060001",
   "med_rent_percent_income" = "H070001",
+  "rent_0_100" = "H062003",
+  "rent_100_150" = "H062004",
+  "rent_150_200" = "H062005",
+  "rent_200_250" = "H062006",
+  "rent_250_300" = "H062007",
+  "rent_300_350" = "H062008",
+  "rent_350_400" = "H062009",
+  "rent_400_450" = "H062010",
+  "rent_450_500" = "H062011",
+  "rent_500_550" = "H062012",
+  "rent_550_600" = "H062013",
+  "rent_600_650" = "H062014",
+  "rent_650_700" = "H062015",
+  "rent_700_750" = "H062016",
+  "rent_750_800" = "H062017",
+  "rent_800_900" = "H062018",
+  "rent_900_1000" = "H062019",
+  "rent_1000_1250" = "H062020",
+  "rent_1250_1500" = "H062021",
+  "rent_1500_2000" = "H062022",
+  "rent_2000_more" = "H062023",
   "poverty_base"  =  "P087001",
   "poverty"  =  "P087002",
   "unemployment_base" = "PCT035001",
@@ -788,8 +860,10 @@ for(var in varlist_00_sf3){
 acs19 <- acs19 %>% select(-moe, -NAME) %>%
   group_by(GEOID) %>%
   pivot_wider(names_from = variable, values_from = estimate) %>%
-  mutate(below_hs = below_hs_1 + below_hs_2) %>%
-  select(-below_hs_1, -below_hs_2) %>%
+  mutate(below_hs = below_hs_1 + below_hs_2,
+         rent_2000_more = rent_2000_2500 + rent_2500_3000 + rent_3000_3500 + rent_3500_more) %>%
+  select(-below_hs_1, -below_hs_2,
+         -rent_2000_2500, -rent_2500_3000, -rent_3000_3500, -rent_3500_more) %>%
   pivot_longer(cols = !GEOID, names_to = "variable", values_to = "estimate") %>%
   ungroup()
 
@@ -885,4 +959,11 @@ full <- acs19 %>%
   distinct(.keep_all = TRUE) %>%
   arrange(GEOID, variable)
 
-fwrite(full, "~/Git/variables_and_functions/data/output/vars.csv")
+## Check for missing values
+full %>% 
+  filter(!(variable %in% 
+             (full %>% filter(!is.na(est2019)) %>% pull(variable) %>% unique()))) %>%
+  pull(variable) %>% unique()
+  
+
+#fwrite(full, "~/Git/variables_and_functions/data/output/decades.csv")
