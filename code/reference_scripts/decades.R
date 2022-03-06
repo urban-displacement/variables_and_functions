@@ -999,10 +999,6 @@ census00 <- data.frame(
   GEOID = character(),
   value = numeric())
 
-census90 <- data.frame(
-  GEOID = character(),
-  value = numeric())
-
 for(var in varlist_19){
   acs19 <- bind_rows(acs19, get_acs(geography = "tract", 
                                     variables = var, 
@@ -1082,8 +1078,7 @@ census00 <- census00 %>% select(-NAME) %>%
                        female_below_hs_1 + female_below_hs_2 + female_below_hs_3 + female_below_hs_4 +
                        female_below_hs_5 + female_below_hs_6 + female_below_hs_7 + female_below_hs_8)/totpop25over,
          highschool = 100*(totpop25over - below_hs)/totpop25over,
-         ba_higher = 100*(male_ba + male_ma + male_psd + male_phd +
-           female_ba + female_ma + female_psd + female_phd)/totpop25over,
+         ba_higher = 100*(male_ba + male_ma + male_psd + male_phd + female_ba + female_ma + female_psd + female_phd)/totpop25over,
          ma_higher = 100*(male_ma + male_psd + male_phd + female_ma + female_psd + female_phd)/totpop25over,
          unemployment = 100*(unemployment_1 + unemployment_2)/unemployment_base,
          rentocc_rentburden_less20k = rentocc_rentburden_less20k_1 + rentocc_rentburden_less20k_2,
@@ -1093,12 +1088,11 @@ census00 <- census00 %>% select(-NAME) %>%
          rentocc_rentburden_75kmore = rentocc_rentburden_75k_100k_1 + rentocc_rentburden_75k_100k_2 +
            rentocc_rentburden_100kmore_1 + rentocc_rentburden_100kmore_2) %>%
   select(-poverty, -poverty_base, -matches("unemployment_"),
-         -matches("male_"), -matches("female_"),
+         -matches("male_"),
          -built_1990_1994, -built_1995_1998, -built_1999_2000,
          -matches("rentocc_rentburden_less20k_"), -matches("rentocc_rentburden_20k_35k_"),
          -matches("rentocc_rentburden_35k_50k_"), -matches("rentocc_rentburden_50k_75k_"),
          -matches("rentocc_rentburden_75k_100k"), -matches("rentocc_rentburden_100kmore")) %>%
-  mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~ 100*./totpop25over) %>%
   pivot_longer(cols = !GEOID, names_to = "variable", values_to = "value") %>%
   ungroup()
 
@@ -1215,7 +1209,6 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2019`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2010`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2000`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
-
 
 write_rds(full, "~/Git/variables_and_functions/data/output/decades.rds")
 write_rds(full_percent, "~/Git/variables_and_functions/data/output/decades_percent.rds")
