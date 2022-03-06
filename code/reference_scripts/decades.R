@@ -7,6 +7,7 @@
 if(!require(pacman)) install.packages("pacman")
 p_load(tidyr, dplyr, tigris, tidycensus, yaml, sf, stringr, fst,
        googledrive, bit64,magrittr, fs, data.table, tidyverse, spdep)
+p_load_gh("keberwein/blscrapeR")
 options(tigris_use_cache = TRUE,
         tigris_class = "sf")
 if(!require(lehdr)){devtools::install_github("jamgreen/lehdr")}else{library(lehdr)}
@@ -109,6 +110,7 @@ income_vars_19 <- c(
   "income_100k_150k_renters" =   "B25118_024",
   "income_150k_more_renters" =   "B25118_025",
   
+  "hh_Black" = "B19001B_001",
   "income_less_10k_Black" =  "B19001B_002",
   "income_10k_15k_Black" =   "B19001B_003",
   "income_15k_20k_Black" =   "B19001B_004",
@@ -125,6 +127,7 @@ income_vars_19 <- c(
   "income_125k_150k_Black" = "B19001B_015",
   "income_150k_200k_Black" = "B19001B_016",
   "income_200k_more_Black" = "B19001B_017",
+  "hh_Asian" = "B19001D_001",
   "income_less_10k_Asian" =  "B19001D_002",
   "income_10k_15k_Asian" =   "B19001D_003",
   "income_15k_20k_Asian" =   "B19001D_004",
@@ -141,6 +144,7 @@ income_vars_19 <- c(
   "income_125k_150k_Asian" = "B19001D_015",
   "income_150k_200k_Asian" = "B19001D_016",
   "income_200k_more_Asian" = "B19001D_017",
+  "hh_WhiteNonHisp" =  "B19001H_001",
   "income_less_10k_WhiteNonHisp" =  "B19001H_002",
   "income_10k_15k_WhiteNonHisp" =   "B19001H_003",
   "income_15k_20k_WhiteNonHisp" =   "B19001H_004",
@@ -157,6 +161,7 @@ income_vars_19 <- c(
   "income_125k_150k_WhiteNonHisp" = "B19001H_015",
   "income_150k_200k_WhiteNonHisp" = "B19001H_016",
   "income_200k_more_WhiteNonHisp" = "B19001H_017",
+  "hh_Latinx" = "B19001I_001",
   "income_less_10k_Latinx" =  "B19001I_002",
   "income_10k_15k_Latinx" =   "B19001I_003",
   "income_15k_20k_Latinx" =   "B19001I_004",
@@ -352,6 +357,7 @@ income_vars_10 <- c(
   "income_100k_150k_renters" =   "B25118_024",
   "income_150k_more_renters" =   "B25118_025",
   
+  "hh_Black" = "B19001B_001",
   "income_less_10k_Black" =  "B19001B_002",
   "income_10k_15k_Black" =   "B19001B_003",
   "income_15k_20k_Black" =   "B19001B_004",
@@ -368,6 +374,7 @@ income_vars_10 <- c(
   "income_125k_150k_Black" = "B19001B_015",
   "income_150k_200k_Black" = "B19001B_016",
   "income_200k_more_Black" = "B19001B_017",
+  "hh_Asian" =  "B19001D_001",
   "income_less_10k_Asian" =  "B19001D_002",
   "income_10k_15k_Asian" =   "B19001D_003",
   "income_15k_20k_Asian" =   "B19001D_004",
@@ -384,6 +391,7 @@ income_vars_10 <- c(
   "income_125k_150k_Asian" = "B19001D_015",
   "income_150k_200k_Asian" = "B19001D_016",
   "income_200k_more_Asian" = "B19001D_017",
+  "hh_WhiteNonHisp" =  "B19001H_001",
   "income_less_10k_WhiteNonHisp" =  "B19001H_002",
   "income_10k_15k_WhiteNonHisp" =   "B19001H_003",
   "income_15k_20k_WhiteNonHisp" =   "B19001H_004",
@@ -400,6 +408,7 @@ income_vars_10 <- c(
   "income_125k_150k_WhiteNonHisp" = "B19001H_015",
   "income_150k_200k_WhiteNonHisp" = "B19001H_016",
   "income_200k_more_WhiteNonHisp" = "B19001H_017",
+  "hh_Latinx" =  "B19001I_001",
   "income_less_10k_Latinx" =  "B19001I_002",
   "income_10k_15k_Latinx" =   "B19001I_003",
   "income_15k_20k_Latinx" =   "B19001I_004",
@@ -600,6 +609,7 @@ income_vars_00 <- c( ## sf3
   "income_100k_150k_renters" =   "HCT011024",
   "income_150k_more_renters" =   "HCT011025",
   
+  "hh_Black" =  "P151B001",
   "income_less_10k_Black" =  "P151B002",
   "income_10k_15k_Black" =   "P151B003",
   "income_15k_20k_Black" =   "P151B004",
@@ -616,6 +626,7 @@ income_vars_00 <- c( ## sf3
   "income_125k_150k_Black" = "P151B015",
   "income_150k_200k_Black" = "P151B016",
   "income_200k_more_Black" = "P151B017",
+  "hh_Asian" =  "P151D001",
   "income_less_10k_Asian" =  "P151D002",
   "income_10k_15k_Asian" =   "P151D003",
   "income_15k_20k_Asian" =   "P151D004",
@@ -632,6 +643,7 @@ income_vars_00 <- c( ## sf3
   "income_125k_150k_Asian" = "P151D015",
   "income_150k_200k_Asian" = "P151D016",
   "income_200k_more_Asian" = "P151D017",
+  "hh_WhiteNonHisp" =  "P151I001",
   "income_less_10k_WhiteNonHisp" =  "P151I002",
   "income_10k_15k_WhiteNonHisp" =   "P151I003",
   "income_15k_20k_WhiteNonHisp" =   "P151I004",
@@ -648,6 +660,7 @@ income_vars_00 <- c( ## sf3
   "income_125k_150k_WhiteNonHisp" = "P151I015",
   "income_150k_200k_WhiteNonHisp" = "P151I016",
   "income_200k_more_WhiteNonHisp" = "P151I017",
+  "hh_Latinx" =  "P151H001",
   "income_less_10k_Latinx" =  "P151H002",
   "income_10k_15k_Latinx" =   "P151H003",
   "income_15k_20k_Latinx" =   "P151H004",
@@ -713,33 +726,9 @@ burden_vars_00 <- c(
   "rent_2000_more" = "H062023",
   "poverty_base"  =  "P087001",
   "poverty"  =  "P087002",
-  "unemployment_base" = "PCT035001",
-  "unemployment_1" =  "PCT035008",
-  "unemployment_2" =  "PCT035015",
-  "unemployment_3" =  "PCT035022", 
-  "unemployment_4" =  "PCT035029",
-  "unemployment_5" =  "PCT035036",
-  "unemployment_6" =  "PCT035043", 
-  "unemployment_7" =  "PCT035050",
-  "unemployment_8" =  "PCT035057",
-  "unemployment_9" =  "PCT035064",
-  "unemployment_10" = "PCT035071",
-  "unemployment_11" = "PCT035078",
-  "unemployment_12" = "PCT035085",
-  "unemployment_13" = "PCT035092", 
-  "unemployment_14" = "PCT035100", 
-  "unemployment_15" = "PCT035107",
-  "unemployment_16" = "PCT035114",
-  "unemployment_17" = "PCT035121",
-  "unemployment_18" = "PCT035128",
-  "unemployment_19" = "PCT035135",
-  "unemployment_20" = "PCT035142",
-  "unemployment_21" = "PCT035149",
-  "unemployment_22" = "PCT035156", 
-  "unemployment_23" = "PCT035163",
-  "unemployment_24" = "PCT035170", 
-  "unemployment_25" = "PCT035177",
-  "unemployment_26" = "PCT035184",
+  "unemployment_base" = "P043001",
+  "unemployment_1" =  "P043007",
+  "unemployment_2" =  "P043014",
   "welfare" = "P064002",
   "h_units_w_mortgage_30_35perc" = "HCT047C008",
   "h_units_w_mortgage_35_40perc" = "HCT047C009",
@@ -787,7 +776,190 @@ varlist_00_sf3 = list(tenure_vars_00_sf3,
 ###### 1990 Variables  ################################################
 #######################################################################
 
+race_vars_90 <- c( ##sf1
+  "population"= "ET1001",
+  #"med_age" = "P013001",
+  "white" =  "ET2001",
+  "black" =  "ET2002",
+  "amind" =  "ET2003",
+  "asian_pacis" =  "ET2004",
+  #"pacis" =  "P004009",
+  "other_race2" =  "ET2005",
+  #"race2" =  "P004011",
+  "latinx" = "P004002"
+  )
 
+tenure_vars_90_sf1 <- c(
+  "hh_count" = "EUO001",
+  "owner_count" = "ES1001",
+  "renter_count" = "ES1002",
+  "homeval_lower_quartile" = "ESS001",
+  "homeval_med" = "EST001",
+  "homeval_upper_quartile" = "ESU001",
+  "total_units" = "ESA001",
+  "occupied_units" = "ESN001",
+  "vacant_units" = "ESN002",
+  'ownocc_.5_less_per_room' = 'ESQ001',
+  'ownocc_.5to1_per_room' = 'ESQ002',
+  'ownocc_1to1.5_per_room' = 'ESQ003',
+  'ownocc_1.5to2_per_room' = 'ESQ004',
+  'ownocc_2more_per_room' = 'ESQ005',
+  'rentocc_.5_less_per_room' = 'ESQ006',
+  'rentocc_.5to1_per_room' = 'ESQ007',
+  'rentocc_1to1.5_per_room' = 'ESQ008',
+  'rentocc_1.5to2_per_room' = 'ESQ009',
+  'rentocc_2more_per_room' = 'ESQ010')
+
+tenure_vars_90_sf3 <- c(
+  "built_1998_on" = "EX7001",
+  "built_1985_1988" = "EX7002",
+  "built_1980_1984" = "EX7003",
+  "built_1970_1979" = "EX7004" ,
+  "built_1960_1969" = "EX7005",
+  "built_1950_1959" = "EX7006",
+  "built_1940_1949" =  "EX7007",
+  "built_1939_before" = "EX7008",
+  "built_median" = "EX8001",
+)
+
+income_vars_90 <- c( ## sf3
+  "medinc" = "E4U001",  
+  "income_less_5k_all" =   "E4T001",
+  "income_5k_10k_all"  =   "E4T002",
+  "income_10k_12.5k_all" =   "E4T003",
+  "income_12.5k_15k_all" =   "E4T004",
+  "income_15k_17.5k_all" =   "E4T005",
+  "income_17.5k_20k_all" =   "E4T006",
+  "income_20k_22.5k_all" =   "E4T007",
+  "income_22.5k_25k_all" =   "E4T008",
+  "income_25k_27.5k_all" =   "E4T009",
+  "income_27.5k_30k_all" =   "E4T010",
+  "income_30k_32.5k_all" =   "E4T011",
+  "income_32.5k_35k_all" =   "E4T012",
+  "income_35k_37.5k_all" =   "E4T013",
+  "income_37.5k_40k_all" =   "E4T014",
+  "income_40k_42.5k_all" =   "E4T015",
+  "income_42.5k_45k_all" =   "E4T016",
+  "income_45k_47.5k_all" =   "E4T017",
+  "income_47.5k_50k_all" =   "E4T018",
+  "income_50k_55k_all" =   "E4T019",
+  "income_55k_60k_all" =   "E4T020",
+  "income_60k_75k_all" =   "E4T021",
+  "income_75k_100k_all" =  "E4T022",
+  "income_100k_125k_all" = "E4T023",
+  "income_125k_150k_all" = "E4T024",
+  "income_150k_more_all" = "E4T025",
+
+  "income_less_5k_Black" =  "E4W010",
+  "income_5k_10k_Black"  =  "E4W011",
+  "income_10k_15k_Black" =   "E4W012",
+  "income_15k_25k_Black" =   "E4W013",
+  "income_25k_35k_Black" =   "E4W014",
+  "income_35k_50k_Black" =   "E4W015",
+  "income_50k_75k_Black" =   "E4W016",
+  "income_75k_100k_Black" =  "E4W017",
+  "income_100k_more_Black" = "E4W018",
+  "income_less_5k_Asian" =  "E4W028",
+  "income_5k_10k_Asian"  =  "E4W029",
+  "income_10k_15k_Asian" =   "E4W030",
+  "income_15k_25k_Asian" =   "E4W031",
+  "income_25k_35k_Asian" =   "E4W032",
+  "income_35k_50k_Asian" =   "E4W033",
+  "income_50k_75k_Asian" =   "E4W034",
+  "income_75k_100k_Asian" =  "E4W035",
+  "income_100k_more_Asian" = "E4W036",
+  "income_less_5k_WhiteNonHisp" =  "E4W001",
+  "income_5k_10k_WhiteNonHisp"  =  "E4W002",
+  "income_10k_15k_WhiteNonHisp" =   "E4W003",
+  "income_15k_25k_WhiteNonHisp" =   "E4W004",
+  "income_25k_35k_WhiteNonHisp" =   "E4W005",
+  "income_35k_50k_WhiteNonHisp" =   "E4W006",
+  "income_50k_75k_WhiteNonHisp" =   "E4W007",
+  "income_75k_100k_WhiteNonHisp" =  "E4W008",
+  "income_100k_more_WhiteNonHisp" = "E4W009",
+  "income_less_5k_Asian" =  "E4X001",
+  "income_5k_10k_Asian"  =  "E4X002",
+  "income_10k_15k_Asian" =   "E4X003",
+  "income_15k_25k_Asian" =   "E4X004",
+  "income_25k_35k_Asian" =   "E4X005",
+  "income_35k_50k_Asian" =   "E4X006",
+  "income_50k_75k_Asian" =   "E4X007",
+  "income_75k_100k_Asian" =  "E4X008",
+  "income_100k_more_Asian" = "E4X009")
+
+burden_vars_90 <- c(
+  "rent_burden_0_10" = "H069002",
+  "rent_burden_10_15" = "H069003",
+  "rent_burden_15_20" = "H069004",
+  "rent_burden_20_25" = "H069005",
+  "rent_burden_25_30" = "H069006",
+  "rent_burden_30_35" = "H069007",
+  "rent_burden_35_40" = "H069008",
+  "rent_burden_40_50" = "H069009",
+  "rent_burden_50_more" = "H069010",
+  
+  "rentocc_rentburden_less10k_1" = "EY2004",
+  "rentocc_rentburden_less10k_2" = "EY2005",
+  "rentocc_rentburden_10k_20k_1" = "EY2010",
+  "rentocc_rentburden_10k_20k_2" = "EY2011",
+  "rentocc_rentburden_20k_35k_1" = "EY2016",
+  "rentocc_rentburden_20k_35k_2" = "EY2017",
+  "rentocc_rentburden_35k_50k_1" = "EY2022",
+  "rentocc_rentburden_35k_50k_2" = "EY2023",
+  "rentocc_rentburden_50k_more_1" = "EY2028",
+  "rentocc_rentburden_50k_more_2" = "EY2029",
+  "med_rent" = "EYU001",
+  #"med_rent_percent_income" = "H070001",
+  "rent_0_100" = "EYT001",
+  "rent_100_150" = "EYT002",
+  "rent_150_200" = "EYT003",
+  "rent_200_250" = "EYT004",
+  "rent_250_300" = "EYT005",
+  "rent_300_350" = "EYT006",
+  "rent_350_400" = "EYT007",
+  "rent_400_450" = "EYT008",
+  "rent_450_500" = "EYT009",
+  "rent_500_550" = "EYT010",
+  "rent_550_600" = "EYT011",
+  "rent_600_650" = "EYT012",
+  "rent_650_700" = "EYT013",
+  "rent_700_750" = "EYT014",
+  "rent_750_1000" = "EYT015",
+  "rent_1000_more" = "EYT016",
+  "poverty_base"  =  "P087001",
+  "poverty_1"  =  "E1C001",
+  "poverty_2"  =  "E1C002",
+  "poverty_3"  =  "E1C003",
+  "unemployment_base" = "P043001",
+  "unemployment_1" =  "E4I003",
+  "unemployment_2" =  "E4I007",
+  "welfare" = "E5A001",
+  "h_units_w_mortgage_30_35perc" = "EZC004",
+  "h_units_w_mortgage_35moreperc" = "EZC005",
+)
+
+hh_vars_90 <- c( 
+  #"avg_hh_size" = "H018001",
+  'h_units_1_detached' = 'ETH001',
+  'h_units_1_attached' = 'ETH002',
+  'h_units_2' = 'ETH003',
+  'h_units_3or4' = 'ETH004',
+  'h_units_5to9' = 'ETH005',
+  'h_units_10to19' = 'ETH006',
+  'h_units_20to49' = 'ETH007',
+  'h_units_50more' = 'ETH008',
+  'h_units_MH' = 'ETH009',
+  'h_units_BoatRV' = 'ETH010'
+)
+
+edu_vars_90 <- c(
+  "totpop25over" = "P148C001",
+  "below_hs_1" = "E33001",
+  "below_hs_2" = "E33002",
+  "ba" = "E33006",
+  "ma" = "E33007",
+  "only_english" = "PCT011002"
+)
 
 #######################################################################
 ###### Dataset Creation ###############################################
@@ -890,13 +1062,7 @@ census00 <- census00 %>% select(-NAME) %>%
          highschool = totpop25over - below_hs,
          ba_higher = male_ba + male_ma + female_ba + female_ma,
          ma_higher = male_ma + female_ma,
-         unemployment = 100*(unemployment_1 + unemployment_2 + unemployment_3 + unemployment_4 + 
-           unemployment_5 + unemployment_6 + unemployment_7 + unemployment_8 + 
-           unemployment_9 + unemployment_10 + unemployment_11 + unemployment_12 + 
-           unemployment_13 + unemployment_14 + unemployment_15 + unemployment_16 + 
-           unemployment_17 + unemployment_18 + unemployment_19 + unemployment_20 +
-           unemployment_21 + unemployment_22 + unemployment_23 + unemployment_24 + 
-           unemployment_25 + unemployment_26)/unemployment_base,
+         unemployment = 100*(unemployment_1 + unemployment_2)/unemployment_base,
          rentocc_rentburden_less20k = rentocc_rentburden_less20k_1 + rentocc_rentburden_less20k_2,
          rentocc_rentburden_20k_35k = rentocc_rentburden_20k_35k_1 + rentocc_rentburden_20k_35k_2,
          rentocc_rentburden_35k_50k = rentocc_rentburden_35k_50k_1 + rentocc_rentburden_35k_50k_2,
@@ -919,7 +1085,8 @@ ltdb  =  read.csv('~/Git/displacement-measure/data/raw/crosswalk_2000_2010.csv',
                     "trtid00"="character", 
                     "trtid10"="character")) 
 
-meds <- c("built_median", "homeval_med", "med_age", "med_rent", "medinc")
+meds <- c("built_median", "homeval_med", "med_age", "med_rent", "medinc",
+          "avg_hh_size", "homeval_lower_quartile", "homeval_upper_quartile")
 
 #Weighted sums for crosswalk 
 temp <- ltdb %>% inner_join( 
@@ -959,10 +1126,65 @@ full <- acs19 %>%
   distinct(.keep_all = TRUE) %>%
   arrange(GEOID, variable)
 
+full_percent <- full %>% select(GEOID, variable, `2019`) %>%
+    pivot_wider(names_from = "variable", values_from = "2019") %>%
+    mutate_at(vars(amind, asian, black, latinx, other, white, pacis, race2, white), ~100*./population) %>%
+    mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
+    mutate_at(vars(matches("built"), -built_median, matches("h_units"), -matches("h_units_w_")), ~100*./total_units) %>%
+    mutate_at(vars(matches("w_mortgage")), ~100*./owner_count) %>%
+    mutate_at(vars(matches("income_") & matches("_Asian")), ~100*./hh_Asian) %>%
+    mutate_at(vars(matches("income_") & matches("_Black")), ~100*./hh_Black) %>%
+    mutate_at(vars(matches("income_") & matches("_WhiteNonHisp")), ~100*./hh_WhiteNonHisp) %>%
+    mutate_at(vars(matches("income_") & matches("_Latinx")), ~100*./hh_Latinx) %>%
+    mutate_at(vars(matches("income_") & matches("_all")), ~100*./hh_count) %>%
+    mutate_at(vars(matches("income_") & matches("_owners")), ~100*./owner_count) %>%
+    mutate_at(vars(matches("income_") & matches("_renters")), ~100*./renter_count) %>%
+    mutate_at(vars(matches("rent_"), matches("rentocc_")), ~100*./renter_count) %>%
+    mutate_at(vars(matches("ownocc_")), ~100*./owner_count) %>%
+    mutate(vacant_units = 100*vacant_units/total_units) %>%
+    pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2019") %>%
+  left_join(
+    full %>% select(GEOID, variable, `2010`) %>%
+      pivot_wider(names_from = "variable", values_from = "2010") %>%
+      mutate_at(vars(amind, asian, black, latinx, other, white, pacis, race2, white), ~100*./population) %>%
+      mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
+      mutate_at(vars(matches("built"), -built_median, matches("h_units"), -matches("h_units_w_")), ~100*./total_units) %>%
+      mutate_at(vars(matches("w_mortgage")), ~100*./owner_count) %>%
+      mutate_at(vars(matches("income_") & matches("_Asian")), ~100*./hh_Asian) %>%
+      mutate_at(vars(matches("income_") & matches("_Black")), ~100*./hh_Black) %>%
+      mutate_at(vars(matches("income_") & matches("_WhiteNonHisp")), ~100*./hh_WhiteNonHisp) %>%
+      mutate_at(vars(matches("income_") & matches("_Latinx")), ~100*./hh_Latinx) %>%
+      mutate_at(vars(matches("income_") & matches("_all")), ~100*./hh_count) %>%
+      mutate_at(vars(matches("income_") & matches("_owners")), ~100*./owner_count) %>%
+      mutate_at(vars(matches("income_") & matches("_renters")), ~100*./renter_count) %>%
+      mutate_at(vars(matches("rent_"), matches("rentocc_")), ~100*./renter_count) %>%
+      mutate_at(vars(matches("ownocc_")), ~100*./owner_count) %>%
+      mutate(vacant_units = 100*vacant_units/total_units) %>%
+      pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2010")
+  ) %>% left_join(
+    full %>% select(GEOID, variable, `2000`) %>%
+      pivot_wider(names_from = "variable", values_from = "2000") %>%
+      mutate_at(vars(amind, asian, black, latinx, other, white, pacis, race2, white), ~100*./population) %>%
+      mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
+      mutate_at(vars(matches("built"), -built_median, matches("h_units"), -matches("h_units_w_")), ~100*./total_units) %>%
+      mutate_at(vars(matches("w_mortgage")), ~100*./owner_count) %>%
+      mutate_at(vars(matches("income_") & matches("_Asian")), ~100*./hh_Asian) %>%
+      mutate_at(vars(matches("income_") & matches("_Black")), ~100*./hh_Black) %>%
+      mutate_at(vars(matches("income_") & matches("_WhiteNonHisp")), ~100*./hh_WhiteNonHisp) %>%
+      mutate_at(vars(matches("income_") & matches("_Latinx")), ~100*./hh_Latinx) %>%
+      mutate_at(vars(matches("income_") & matches("_all")), ~100*./hh_count) %>%
+      mutate_at(vars(matches("income_") & matches("_owners")), ~100*./owner_count) %>%
+      mutate_at(vars(matches("income_") & matches("_renters")), ~100*./renter_count) %>%
+      mutate_at(vars(matches("rent_"), matches("rentocc_")), ~100*./renter_count) %>%
+      mutate_at(vars(matches("ownocc_")), ~100*./owner_count) %>%
+      mutate(vacant_units = 100*vacant_units/total_units) %>%
+      pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2000")
+  )
+
 ## Check for missing values (should only be variables for structures built post-survey)
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2019`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2010`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2000`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 
 
-#fwrite(full, "~/Git/variables_and_functions/data/output/decades.csv")
+write_rds(full, "~/Git/variables_and_functions/data/output/decades.rds")
