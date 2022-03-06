@@ -949,21 +949,20 @@ temp_meds <- ltdb2 %>% inner_join(
 census00_ltdb <- rbind(temp, temp_meds)
 
 full <- acs19 %>%
-  select(GEOID, variable, est2019 = estimate) %>%
+  select(GEOID, variable, `2019` = estimate) %>%
   full_join(
     acs10 %>%
-      select(GEOID, variable, est2010 = estimate)) %>%
+      select(GEOID, variable, `2010` = estimate)) %>%
   full_join(
     census00_ltdb %>%
-      select(GEOID, variable, est2000 = estimate)) %>%
+      select(GEOID, variable, `2000` = estimate)) %>%
   distinct(.keep_all = TRUE) %>%
   arrange(GEOID, variable)
 
-## Check for missing values
-full %>% 
-  filter(!(variable %in% 
-             (full %>% filter(!is.na(est2019)) %>% pull(variable) %>% unique()))) %>%
-  pull(variable) %>% unique()
-  
+## Check for missing values (should only be variables for structures built post-survey)
+full %>% filter(!(variable %in% (full %>% filter(!is.na(`2019`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
+full %>% filter(!(variable %in% (full %>% filter(!is.na(`2010`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
+full %>% filter(!(variable %in% (full %>% filter(!is.na(`2000`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
+
 
 #fwrite(full, "~/Git/variables_and_functions/data/output/decades.csv")
