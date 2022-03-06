@@ -5,7 +5,8 @@
 
 ### Loading required packages and setting defaults
 if(!require(pacman)) install.packages("pacman")
-p_load(tidyr, dplyr, tigris, tidycensus, yaml, sf, stringr, fst,  googledrive, bit64,magrittr, fs, data.table, tidyverse, spdep)
+p_load(tidyr, dplyr, tigris, tidycensus, yaml, sf, stringr, fst,
+       googledrive, bit64,magrittr, fs, data.table, tidyverse, spdep)
 options(tigris_use_cache = TRUE,
          tigris_class = "sf")
 if(!require(lehdr)){devtools::install_github("jamgreen/lehdr")}else{library(lehdr)}
@@ -17,13 +18,11 @@ select <- dplyr::select
 # options(width = Sys.getenv('COLUMNS'))
 
 ### Set API key
-census_api_key('4c26aa6ebbaef54a55d3903212eabbb506ade381') #enter your own key here
+census_api_key(yaml::read_yaml("~/census.yaml")) #enter your own key here
 
 #######################################################################
 ###### 2019 Variables  ################################################
 #######################################################################
-
-
 
 race_vars_19 <- c(
   "population"= "DP05_0001",
@@ -38,8 +37,6 @@ race_vars_19 <- c(
   "race2" = "B03002_009",
   "latinx" = "B03002_012")
   
-
-
 tenure_vars_19 <-c(
   "hh_count" = "B09019_001",
   "ownerp" = "DP04_0046P",
