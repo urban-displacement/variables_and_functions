@@ -1065,7 +1065,7 @@ acs19 <- acs19 %>% select(-moe, -NAME) %>%
 acs10 <- acs10 %>% select(-moe, -NAME) %>%
   group_by(GEOID) %>%
   pivot_wider(names_from = variable, values_from = estimate) %>%
-  mutate(poverty_rate = poverty/poverty_base,
+  mutate(poverty_rate = 100*poverty/poverty_base,
          built_2000_2009 = built_2000_2004 + built_2005_on,
          below_hs = male_below_hs_1 + male_below_hs_2 + male_below_hs_3 + male_below_hs_4 +
            male_below_hs_5 + male_below_hs_6 + male_below_hs_7 + male_below_hs_8 +
@@ -1083,9 +1083,9 @@ acs10 <- acs10 %>% select(-moe, -NAME) %>%
 census00 <- census00 %>% select(-NAME) %>%
   group_by(GEOID) %>%
   pivot_wider(names_from = variable, values_from = value) %>%
-  mutate(poverty_rate = poverty/poverty_base,
-         renterp = renter_count/hh_count,
-         ownerp = owner_count/hh_count,
+  mutate(poverty_rate = 100*poverty/poverty_base,
+         renterp = 100*renter_count/hh_count,
+         ownerp = 100*owner_count/hh_count,
          built_1990_1999 = built_1990_1994 + built_1995_1998 + built_1999_2000,
          below_hs = male_below_hs_1 + male_below_hs_2 + male_below_hs_3 + male_below_hs_4 +
                        male_below_hs_5 + male_below_hs_6 + male_below_hs_7 + male_below_hs_8 +
@@ -1117,10 +1117,11 @@ ltdb  =  read.csv('~/Git/displacement-measure/data/raw/crosswalk_2000_2010.csv',
 
 meds <- c("built_median", "homeval_med", "med_rent", "medinc",
           "avg_hh_size", "homeval_lower_quartile", "homeval_upper_quartile")
+pcts <- c("renterp", "ownerp", "med_rent_percent_income", "poverty_rate")
 
 #Weighted sums for crosswalk 
 temp <- ltdb %>% inner_join( 
-  census00 %>% filter(!(variable %in% meds) & variable != "med_rent_percent_income"), 
+  census00 %>% filter(!(variable %in% meds) & !(variable %in% pcts)), 
   by = c("trtid00" = "GEOID")) %>%
   mutate(estimate = value*weight) %>%
   group_by(trtid10, variable) %>%
@@ -1128,7 +1129,7 @@ temp <- ltdb %>% inner_join(
   rename(GEOID = trtid10)
 
 temp_pct <- ltdb %>% inner_join(
-  census00 %>% filter(variable == "med_rent_percent_income"), 
+  census00 %>% filter(variable %in% pcts), 
   by = c("trtid00" = "GEOID")) %>%
   group_by(trtid10, variable) %>%
   summarize(estimate = weighted.mean(value, weight, na.rm = TRUE)) %>%
