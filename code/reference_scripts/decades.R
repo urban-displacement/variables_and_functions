@@ -1339,7 +1339,7 @@ full %>% filter(!(variable %in% (full %>% filter(!is.na(`2000`)) %>% pull(variab
 full_wide <- full %>% pivot_wider(GEOID, names_from = variable, values_from = `2019`:`2000`)
 full_percent_wide <- full_percent %>% pivot_wider(GEOID, names_from = variable, values_from = `2019`:`2000`)
 
-write_rds(full, "~/Git/variables_and_functions/data/output/decades.rds")
-write_rds(full_percent, "~/Git/variables_and_functions/data/output/decades_percent.rds")
-write_rds(full_wide, "~/Git/variables_and_functions/data/output/decades_wide.rds")
-write_rds(full_percent_wide, "~/Git/variables_and_functions/data/output/decades_percent_wide.rds")
+write_rds(full %>% filter(substr(GEOID, 1, 5) == "17031"), "~/Git/variables_and_functions/data/output/decades.rds")
+write_rds(full_percent %>% filter(substr(GEOID, 1, 5) == "17031"), "~/Git/variables_and_functions/data/output/decades_percent.rds")
+write_rds(full_wide %>% filter(substr(GEOID, 1, 5) == "17031"), "~/Git/variables_and_functions/data/output/decades_wide.rds")
+write_rds(full_percent_wide %>% filter(substr(GEOID, 1, 5) == "17031"), "~/Git/variables_and_functions/data/output/decades_percent_wide.rds")
