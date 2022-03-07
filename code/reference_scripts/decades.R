@@ -1148,6 +1148,94 @@ full <- full %>%
          `2000` = ifelse(variable %in% c("homeval_lower_quartile", "homeval_med", "homeval_upper_quartile", "med_rent", "medinc"),
                          1.49118*`2000`, `2000`))
 
+closest <- function(x, limits) {
+  unlist(sapply(x, function(x, limits) limits[which.min(abs(limits - x))], limits))
+}
+incomes <- c(10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000,
+             50000, 60000, 75000, 100000, 125000, 150000, 200000, Inf)
+rents <- c(100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 
+           700, 750, 800, 900, 1000, 1250, 1500, 2000, Inf)
+
+county_mhi <- bind_rows(
+  get_acs(geography = "county", state = state, variables = "B19013_001", year = 2019) %>% mutate(YEAR = 2019),
+  get_acs(geography = "county", state = state, variables = "B19013_001", year = 2010) %>% mutate(YEAR = 2010),
+  get_decennial(geography = "county", state = state, variables = "P053001", year = 2000) %>% mutate(YEAR = 2000) %>% rename(estimate = value)
+) %>% filter(str_detect(NAME, county)) %>%
+  select(NAME, YEAR, AMI = estimate) %>%
+  mutate(AMI80 = 0.8*AMI,
+         AMI120 = 1.2*AMI,
+         RENT80 = 0.3*AMI80/12,
+         RENT120 = 0.3*AMI120/12) %>%
+  mutate(AMI_LI = ifelse(!is.na(AMI80), closest(AMI80, incomes), NA),
+         AMI_HI = ifelse(!is.na(AMI120), closest(AMI120, incomes), NA),
+         RENT_LI = ifelse(!is.na(RENT80), closest(RENT80, rents), NA),
+         RENT_HI = ifelse(!is.na(RENT120), closest(RENT120, rents), NA))
+
+tract_mhi <- full %>% filter(str_detect(variable, "income_")) %>%
+  separate(variable, c("var", "lower", "upper", "type"), remove = FALSE) %>%
+  mutate_at(vars(lower, upper), function(x) str_replace(x, "k", "000")) %>%
+  mutate_at(vars(lower, upper), function(x) ifelse(x == "less", "0", x)) %>%
+  mutate_at(vars(lower, upper), function(x) ifelse(x == "more", "Inf", x)) %>%
+  mutate_at(vars(lower, upper), as.numeric) %>%
+  mutate(income2019 = case_when(
+    upper <= county_mhi$AMI_LI[county_mhi$YEAR == 2019] ~ "LI",
+    upper <= county_mhi$AMI_HI[county_mhi$YEAR == 2019] ~ "MI",
+    upper > county_mhi$AMI_HI[county_mhi$YEAR == 2019] ~ "HI",
+  )) %>%
+  mutate(income2010 = case_when(
+    upper <= county_mhi$AMI_LI[county_mhi$YEAR == 2010] ~ "LI",
+    upper <= county_mhi$AMI_HI[county_mhi$YEAR == 2010] ~ "MI",
+    upper > county_mhi$AMI_HI[county_mhi$YEAR == 2010] ~ "HI",
+  )) %>%
+  mutate(income2000 = case_when(
+    upper <= county_mhi$AMI_LI[county_mhi$YEAR == 2000] ~ "LI",
+    upper <= county_mhi$AMI_HI[county_mhi$YEAR == 2000] ~ "MI",
+    upper > county_mhi$AMI_HI[county_mhi$YEAR == 2000] ~ "HI",
+  ))
+
+tract_rent <- full %>% filter(str_detect(variable, "rent_[0-9]")) %>%
+  separate(variable, c("var", "lower", "upper"), remove = FALSE) %>%
+  mutate_at(vars(lower, upper), function(x) ifelse(x == "more", "Inf", x)) %>%
+  mutate_at(vars(lower, upper), as.numeric) %>%
+  mutate(rent2019 = case_when(
+    upper <= county_mhi$RENT_LI[county_mhi$YEAR == 2019] ~ "LI",
+    upper <= county_mhi$RENT_HI[county_mhi$YEAR == 2019] ~ "MI",
+    upper > county_mhi$RENT_HI[county_mhi$YEAR == 2019] ~ "HI",
+  )) %>%
+  mutate(rent2010 = case_when(
+    upper <= county_mhi$RENT_LI[county_mhi$YEAR == 2010] ~ "LI",
+    upper <= county_mhi$RENT_HI[county_mhi$YEAR == 2010] ~ "MI",
+    upper > county_mhi$RENT_HI[county_mhi$YEAR == 2010] ~ "HI",
+  )) %>%
+  mutate(rent2000 = case_when(
+    upper <= county_mhi$RENT_LI[county_mhi$YEAR == 2000] ~ "LI",
+    upper <= county_mhi$RENT_HI[county_mhi$YEAR == 2000] ~ "MI",
+    upper > county_mhi$RENT_HI[county_mhi$YEAR == 2000] ~ "HI",
+  ))
+
+full <- bind_rows(full,
+                  tract_mhi %>% mutate(variable = paste(var, income2019, type, sep = "_")) %>%
+                    group_by(GEOID, variable) %>% summarize(`2019` = sum(`2019`, na.rm = TRUE)) %>%
+                    left_join(
+                      tract_mhi %>% mutate(variable = paste(var, income2019, type, sep = "_")) %>%
+                        group_by(GEOID, variable) %>% summarize(`2010` = sum(`2010`, na.rm = TRUE))
+                    ) %>%
+                    left_join(
+                      tract_mhi %>% mutate(variable = paste(var, income2000, type, sep = "_")) %>%
+                        group_by(GEOID, variable) %>% summarize(`2000` = sum(`2000`, na.rm = TRUE))
+                    ),
+                  tract_rent %>% mutate(variable = paste(var, rent2019, sep = "_")) %>%
+                    group_by(GEOID, variable) %>% summarize(`2019` = sum(`2019`, na.rm = TRUE)) %>%
+                    left_join(
+                      tract_rent %>% mutate(variable = paste(var, rent2010, sep = "_")) %>%
+                        group_by(GEOID, variable) %>% summarize(`2010` = sum(`2010`, na.rm = TRUE))
+                    ) %>%
+                    left_join(
+                      tract_rent %>% mutate(variable = paste(var, rent2000, sep = "_")) %>%
+                        group_by(GEOID, variable) %>% summarize(`2000` = sum(`2000`, na.rm = TRUE))
+                    )
+)
+
 full_percent <- full %>% select(GEOID, variable, `2019`) %>%
     pivot_wider(names_from = "variable", values_from = "2019") %>%
     mutate_at(vars(amind, asian, black, latinx, other, white, pacis, race2, white), ~100*./population) %>%
