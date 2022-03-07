@@ -556,8 +556,7 @@ race_vars_00 <- c( ##sf1
   "latinx" = "P007010")
 
 tenure_vars_00 <- c(
-  #"hh_count" = "H007001",
-  "hh_count" =  "P052001",
+  "hh_count" = "H007001",
   "owner_count" = "H007002",
   "renter_count" = "H007003",
   "homeval_lower_quartile" = "H075001",
@@ -589,7 +588,8 @@ tenure_vars_00 <- c(
 )
 
 income_vars_00 <- c( ## sf3
-  "medinc" = "P053001",  
+  "medinc" = "P053001",
+  "hh_income_count" =  "P052001",
   "income_less_10k_all" =  "P052002",
   "income_10k_15k_all" =   "P052003",
   "income_15k_20k_all" =   "P052004",
@@ -1267,7 +1267,7 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
     mutate_at(vars(matches("income_") & matches("_Black")), ~100*./hh_Black) %>%
     mutate_at(vars(matches("income_") & matches("_WhiteNonHisp")), ~100*./hh_WhiteNonHisp) %>%
     mutate_at(vars(matches("income_") & matches("_Latinx")), ~100*./hh_Latinx) %>%
-    mutate_at(vars(matches("income_") & matches("_all"), welfare), ~100*./hh_count) %>%
+    mutate_at(vars(matches("income_") & matches("_all"), welfare), ~100*./hh_income_count) %>%
     mutate_at(vars(matches("income_") & matches("_owners")), ~100*./owner_count) %>%
     mutate_at(vars(matches("income_") & matches("_renters")), ~100*./renter_count) %>%
     mutate_at(vars(matches("rent_"), matches("rentocc_"), -med_rent_percent_income), ~100*./renter_count) %>%
