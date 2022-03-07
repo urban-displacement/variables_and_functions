@@ -1274,7 +1274,7 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
     mutate_at(vars(matches("ownocc_")), ~100*./owner_count) %>%
     mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
     mutate(vacant_units = 100*vacant_units/total_units,
-           only_english = only_english/totpop5over) %>%
+           only_english = 100*only_english/totpop5over) %>%
     pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2019") %>%
   left_join(
     full %>% select(GEOID, variable, `2010`) %>%
@@ -1293,7 +1293,7 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
       mutate_at(vars(matches("ownocc_")), ~100*./owner_count) %>%
       mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
       mutate(vacant_units = 100*vacant_units/total_units,
-             only_english = only_english/totpop5over) %>%
+             only_english = 100*only_english/totpop5over) %>%
       pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2010")
   ) %>% left_join(
     full %>% select(GEOID, variable, `2000`) %>%
@@ -1312,7 +1312,7 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
       mutate_at(vars(matches("ownocc_")), ~100*./owner_count) %>%
       mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
       mutate(vacant_units = 100*vacant_units/total_units,
-             only_english = only_english/totpop5over) %>%
+             only_english = 100*only_english/totpop5over) %>%
       pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2000")
   )
 
