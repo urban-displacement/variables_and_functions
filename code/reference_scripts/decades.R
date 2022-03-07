@@ -70,6 +70,7 @@ tenure_vars_19 <-c(
 
 income_vars_19 <- c(
   "medinc" = "B19013_001",
+  "hh_income_count" =  "B19001_001",
   "income_less_10k_all" =  "B19001_002",
   "income_10k_15k_all" =   "B19001_003",
   "income_15k_20k_all" =   "B19001_004",
@@ -318,6 +319,7 @@ tenure_vars_10 <-c(
 # 2019 uses S1903_C03_001 for med income
 income_vars_10 <- c(
   "medinc" = "B19013_001",
+  "hh_income_count" =  "B19001_001",
   "income_less_10k_all" =  "B19001_002",
   "income_10k_15k_all" =   "B19001_003",
   "income_15k_20k_all" =   "B19001_004",
@@ -1153,6 +1155,8 @@ temp_meds <- ltdb2 %>% inner_join(
 
 census00_ltdb <- rbind(temp, temp_pct, temp_meds)
 
+### Create full datasets ###
+
 full <- acs19 %>%
   select(GEOID, variable, `2019` = estimate) %>%
   full_join(
@@ -1193,7 +1197,7 @@ county_mhi <- bind_rows(
          RENT_LI = ifelse(!is.na(RENT80), closest(RENT80, rents), NA),
          RENT_HI = ifelse(!is.na(RENT120), closest(RENT120, rents), NA))
 
-tract_mhi <- full %>% filter(str_detect(variable, "income_")) %>%
+tract_mhi <- full %>% filter(str_detect(variable, "income_") & variable != "hh_income_count") %>%
   separate(variable, c("var", "lower", "upper", "type"), remove = FALSE) %>%
   mutate_at(vars(lower, upper), function(x) str_replace(x, "k", "000")) %>%
   mutate_at(vars(lower, upper), function(x) ifelse(x == "less", "0", x)) %>%
@@ -1286,7 +1290,7 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
       mutate_at(vars(matches("income_") & matches("_Black")), ~100*./hh_Black) %>%
       mutate_at(vars(matches("income_") & matches("_WhiteNonHisp")), ~100*./hh_WhiteNonHisp) %>%
       mutate_at(vars(matches("income_") & matches("_Latinx")), ~100*./hh_Latinx) %>%
-      mutate_at(vars(matches("income_") & matches("_all"), welfare), ~100*./hh_count) %>%
+      mutate_at(vars(matches("income_") & matches("_all"), welfare), ~100*./hh_income_count) %>%
       mutate_at(vars(matches("income_") & matches("_owners")), ~100*./owner_count) %>%
       mutate_at(vars(matches("income_") & matches("_renters")), ~100*./renter_count) %>%
       mutate_at(vars(matches("rent_"), matches("rentocc_"), -med_rent_percent_income), ~100*./renter_count) %>%
@@ -1305,7 +1309,7 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
       mutate_at(vars(matches("income_") & matches("_Black")), ~100*./hh_Black) %>%
       mutate_at(vars(matches("income_") & matches("_WhiteNonHisp")), ~100*./hh_WhiteNonHisp) %>%
       mutate_at(vars(matches("income_") & matches("_Latinx")), ~100*./hh_Latinx) %>%
-      mutate_at(vars(matches("income_") & matches("_all"), welfare), ~100*./hh_count) %>%
+      mutate_at(vars(matches("income_") & matches("_all"), welfare), ~100*./hh_income_count) %>%
       mutate_at(vars(matches("income_") & matches("_owners")), ~100*./owner_count) %>%
       mutate_at(vars(matches("income_") & matches("_renters")), ~100*./renter_count) %>%
       mutate_at(vars(matches("rent_"), matches("rentocc_"), -med_rent_percent_income), ~100*./renter_count) %>%
@@ -1316,10 +1320,26 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
       pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2000")
   )
 
+full <- full %>% 
+  mutate(variable = ifelse(variable %in% pcts, paste0(variable, "_p"), paste0(variable, "_n")))
+full_percent <- full_percent %>% 
+  mutate(variable = ifelse(variable %in% (
+    full_percent %>% 
+      group_by(variable) %>%
+      summarize_if(is.numeric, max, na.rm = TRUE) %>% 
+      filter_if(is.numeric, any_vars(. > 100.001)) %>%
+      pull(variable)
+  ), paste0(variable, "_n"), paste0(variable, "_p")))
+
 ## Check for missing values (should only be variables for structures built post-survey)
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2019`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2010`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2000`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 
+full_wide <- full %>% pivot_wider(GEOID, names_from = variable, values_from = `2019`:`2000`)
+full_percent_wide <- full_percent %>% pivot_wider(GEOID, names_from = variable, values_from = `2019`:`2000`)
+
 write_rds(full, "~/Git/variables_and_functions/data/output/decades.rds")
 write_rds(full_percent, "~/Git/variables_and_functions/data/output/decades_percent.rds")
+write_rds(full_wide, "~/Git/variables_and_functions/data/output/decades_wide.rds")
+write_rds(full_percent_wide, "~/Git/variables_and_functions/data/output/decades_percent_wide.rds")
