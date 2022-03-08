@@ -1321,7 +1321,10 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
   )
 
 full <- full %>% 
-  mutate(variable = ifelse(variable %in% pcts, paste0(variable, "_p"), paste0(variable, "_n")))
+  mutate(variable = ifelse(variable %in% pcts, paste0(variable, "_p"), paste0(variable, "_n"))) %>%
+  mutate(`2000_2010` = `2010` - `2000`,
+         `2010_2019` = `2019` - `2010`,
+         `2000_2019` = `2019` - `2000`)
 full_percent <- full_percent %>% 
   mutate(variable = ifelse(variable %in% (
     full_percent %>% 
@@ -1329,7 +1332,10 @@ full_percent <- full_percent %>%
       summarize_if(is.numeric, max, na.rm = TRUE) %>% 
       filter_if(is.numeric, any_vars(. > 100.001)) %>%
       pull(variable)
-  ), paste0(variable, "_n"), paste0(variable, "_p")))
+  ), paste0(variable, "_n"), paste0(variable, "_p"))) %>%
+  mutate(`2000_2010` = `2010` - `2000`,
+         `2010_2019` = `2019` - `2010`,
+         `2000_2019` = `2019` - `2000`)
 
 ## Check for missing values (should only be variables for structures built post-survey)
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2019`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
