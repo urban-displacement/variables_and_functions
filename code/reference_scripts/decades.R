@@ -257,7 +257,9 @@ edu_vars_19 <- c(
   "ba_higher" = "S1501_C01_015",
   "ma_higher" = "S1501_C01_013",
   "totpop5over" = "B06007_001",
-  'only_english' = 'B06007_002'
+  'only_english' = 'B06007_002',
+  'spanish_english_notverywell' = 'B06007_005',
+  'otherlang_english_notverywell' = 'B06007_008'
 ) #percentage
 
 varlist_19 = list(race_vars_19, 
@@ -530,9 +532,9 @@ edu_vars_10 <- c(
   "female_psd" = "B15002_034", 
   "female_phd" = "B15002_035", 
   "totpop5over" = "B06007_001",
-  'only_english' = 'B06007_002'#,
-  #'spanish_english_notverywell' = 'B06007_005',
-  #'otherlang_english_notverywell' = 'B06007_008'
+  'only_english' = 'B06007_002',
+  'spanish_english_notverywell' = 'B06007_005',
+  'otherlang_english_notverywell' = 'B06007_008'
 )
 
 varlist_10 = list(race_vars_10, 
@@ -799,8 +801,46 @@ edu_vars_00 <- c(
   "female_ma" = "P037033",
   "female_psd" = "P037034",
   "female_phd" = "P037035",
-  "totpop5over" = "PCT011001",
-  "only_english" = "PCT011002"
+  "totpop5over" = "P019001",
+  "only_english_1" = "P019003",
+  "only_english_2" = "P019025",
+  "only_english_3" = "P019047",
+  "english_notwell_1" = "P019006",
+  "english_notwell_2" = "P019007",
+  "english_notwell_3" = "P019008",
+  "english_notwell_4" = "P019011",
+  "english_notwell_5" = "P019012",
+  "english_notwell_6" = "P019013",
+  "english_notwell_7" = "P019016",
+  "english_notwell_8" = "P019017",
+  "english_notwell_9" = "P019018",
+  "english_notwell_10" = "P019021",
+  "english_notwell_11" = "P019022",
+  "english_notwell_12" = "P019023",
+  "english_notwell_13" = "P019028",
+  "english_notwell_14" = "P019029",
+  "english_notwell_15" = "P019030",
+  "english_notwell_16" = "P019033",
+  "english_notwell_17" = "P019034",
+  "english_notwell_18" = "P019035",
+  "english_notwell_19" = "P019038",
+  "english_notwell_20" = "P019039",
+  "english_notwell_21" = "P019040",
+  "english_notwell_22" = "P019043",
+  "english_notwell_23" = "P019044",
+  "english_notwell_24" = "P019045",
+  "english_notwell_25" = "P019050",
+  "english_notwell_26" = "P019051",
+  "english_notwell_27" = "P019052",
+  "english_notwell_28" = "P019055",
+  "english_notwell_29" = "P019056",
+  "english_notwell_30" = "P019057",
+  "english_notwell_31" = "P019060",
+  "english_notwell_32" = "P019061",
+  "english_notwell_33" = "P019062",
+  "english_notwell_34" = "P019065",
+  "english_notwell_35" = "P019066",
+  "english_notwell_36" = "P019067"
 )
 
 varlist_00 = list(race_vars_00,
@@ -974,7 +1014,7 @@ burden_vars_90 <- c(
   "unemployment_2" =  "E4I007",
   "welfare" = "E5A001",
   "h_units_w_mortgage_30_35perc" = "EZC004",
-  "h_units_w_mortgage_35moreperc" = "EZC005",
+  "h_units_w_mortgage_35moreperc" = "EZC005"
 )
 
 hh_vars_90 <- c( 
@@ -1058,9 +1098,11 @@ acs19 <- acs19 %>% select(-moe, -NAME) %>%
   group_by(GEOID) %>%
   pivot_wider(names_from = variable, values_from = estimate) %>%
   mutate(below_hs = below_hs_1 + below_hs_2,
-         rent_2000_more = rent_2000_2500 + rent_2500_3000 + rent_3000_3500 + rent_3500_more) %>%
+         rent_2000_more = rent_2000_2500 + rent_2500_3000 + rent_3000_3500 + rent_3500_more,
+         limited_english = spanish_english_notverywell + otherlang_english_notverywell) %>%
   select(-below_hs_1, -below_hs_2,
-         -rent_2000_2500, -rent_2500_3000, -rent_3000_3500, -rent_3500_more) %>%
+         -rent_2000_2500, -rent_2500_3000, -rent_3000_3500, -rent_3500_more,
+         -spanish_english_notverywell, -otherlang_english_notverywell) %>%
   pivot_longer(cols = !GEOID, names_to = "variable", values_to = "estimate") %>%
   ungroup()
 
@@ -1075,10 +1117,12 @@ acs10 <- acs10 %>% select(-moe, -NAME) %>%
            female_below_hs_5 + female_below_hs_6 + female_below_hs_7 + female_below_hs_8,
          highschool = totpop25over - below_hs,
          ba_higher = male_ba + male_ma + male_psd + male_phd + female_ba + female_ma + female_psd + female_phd,
-         ma_higher = male_ma + male_psd + male_phd + female_ma + female_psd + female_phd) %>%
+         ma_higher = male_ma + male_psd + male_phd + female_ma + female_psd + female_phd,
+         limited_english = spanish_english_notverywell + otherlang_english_notverywell) %>%
   select(-poverty, -poverty_base,
          -matches("male_"),
-         -built_2000_2004, -built_2005_on) %>%
+         -built_2000_2004, -built_2005_on,
+         -spanish_english_notverywell, -otherlang_english_notverywell) %>%
   pivot_longer(cols = !GEOID, names_to = "variable", values_to = "estimate") %>%
   ungroup()
 
@@ -1102,13 +1146,24 @@ census00 <- census00 %>% select(-NAME) %>%
          rentocc_rentburden_35k_50k = rentocc_rentburden_35k_50k_1 + rentocc_rentburden_35k_50k_2,
          rentocc_rentburden_50k_75k = rentocc_rentburden_50k_75k_1 + rentocc_rentburden_50k_75k_2,
          rentocc_rentburden_75kmore = rentocc_rentburden_75k_100k_1 + rentocc_rentburden_75k_100k_2 +
-           rentocc_rentburden_100kmore_1 + rentocc_rentburden_100kmore_2) %>%
+           rentocc_rentburden_100kmore_1 + rentocc_rentburden_100kmore_2,
+         only_english = only_english_1 + only_english_2 + only_english_3,
+         limited_english = english_notwell_1 + english_notwell_2 + english_notwell_3 + english_notwell_4 +
+           english_notwell_5 + english_notwell_6 + english_notwell_7 + english_notwell_8 + 
+           english_notwell_9 + english_notwell_10 + english_notwell_11 + english_notwell_12 + 
+           english_notwell_13 + english_notwell_14 + english_notwell_15 + english_notwell_16 +
+           english_notwell_17 + english_notwell_18 + english_notwell_19 + english_notwell_20 +
+           english_notwell_21 + english_notwell_22 + english_notwell_23 + english_notwell_24 +
+           english_notwell_25 + english_notwell_26 + english_notwell_27 + english_notwell_28 +
+           english_notwell_26 + english_notwell_30 + english_notwell_31 + english_notwell_32 +
+           english_notwell_33 + english_notwell_34 + english_notwell_35 + english_notwell_36) %>%
   select(-poverty, -poverty_base, -matches("unemployment_"),
          -matches("male_"),
          -built_1990_1994, -built_1995_1998, -built_1999_2000,
          -matches("rentocc_rentburden_less20k_"), -matches("rentocc_rentburden_20k_35k_"),
          -matches("rentocc_rentburden_35k_50k_"), -matches("rentocc_rentburden_50k_75k_"),
-         -matches("rentocc_rentburden_75k_100k"), -matches("rentocc_rentburden_100kmore")) %>%
+         -matches("rentocc_rentburden_75k_100k"), -matches("rentocc_rentburden_100kmore"),
+         -matches("only_english_"), -matches("english_notwell_")) %>%
   pivot_longer(cols = !GEOID, names_to = "variable", values_to = "value") %>%
   ungroup()
 
@@ -1278,7 +1333,8 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
     mutate_at(vars(matches("ownocc_")), ~100*./owner_count) %>%
     mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
     mutate(vacant_units = 100*vacant_units/total_units,
-           only_english = 100*only_english/totpop5over) %>%
+           only_english = 100*only_english/totpop5over,
+           limited_english = 100*limited_english/totpop5over) %>%
     pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2019") %>%
   left_join(
     full %>% select(GEOID, variable, `2010`) %>%
@@ -1297,7 +1353,8 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
       mutate_at(vars(matches("ownocc_")), ~100*./owner_count) %>%
       mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
       mutate(vacant_units = 100*vacant_units/total_units,
-             only_english = 100*only_english/totpop5over) %>%
+             only_english = 100*only_english/totpop5over,
+             limited_english = 100*limited_english/totpop5over) %>%
       pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2010")
   ) %>% left_join(
     full %>% select(GEOID, variable, `2000`) %>%
@@ -1316,28 +1373,35 @@ full_percent <- full %>% select(GEOID, variable, `2019`) %>%
       mutate_at(vars(matches("ownocc_")), ~100*./owner_count) %>%
       mutate_at(vars(below_hs, highschool, ba_higher, ma_higher), ~100*./totpop25over) %>%
       mutate(vacant_units = 100*vacant_units/total_units,
-             only_english = 100*only_english/totpop5over) %>%
+             only_english = 100*only_english/totpop5over,
+             limited_english = 100*limited_english/totpop5over) %>%
       pivot_longer(cols = !GEOID, names_to = "variable", values_to = "2000")
   )
 
 full <- full %>% 
-  mutate(variable = ifelse(variable %in% pcts, paste0(variable, "_p"), paste0(variable, "_n")))
+  mutate(variable = ifelse(variable %in% pcts, paste0(variable, "_p"), paste0(variable, "_n"))) %>%
+  mutate(`2000_2010` = `2010` - `2000`,
+         `2010_2019` = `2019` - `2010`,
+         `2000_2019` = `2019` - `2000`)
 full_percent <- full_percent %>% 
   mutate(variable = ifelse(variable %in% (
-    full_percent %>% 
+    full_percent %>%
       group_by(variable) %>%
       summarize_if(is.numeric, max, na.rm = TRUE) %>% 
       filter_if(is.numeric, any_vars(. > 100.001)) %>%
       pull(variable)
-  ), paste0(variable, "_n"), paste0(variable, "_p")))
+  ), paste0(variable, "_n"), paste0(variable, "_p"))) %>%
+  mutate(`2000_2010` = `2010` - `2000`,
+         `2010_2019` = `2019` - `2010`,
+         `2000_2019` = `2019` - `2000`)
 
 ## Check for missing values (should only be variables for structures built post-survey)
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2019`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2010`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 full %>% filter(!(variable %in% (full %>% filter(!is.na(`2000`)) %>% pull(variable) %>% unique()))) %>% pull(variable) %>% unique()
 
-full_wide <- full %>% pivot_wider(GEOID, names_from = variable, values_from = `2019`:`2000`)
-full_percent_wide <- full_percent %>% pivot_wider(GEOID, names_from = variable, values_from = `2019`:`2000`)
+full_wide <- full %>% pivot_wider(GEOID, names_from = variable, values_from = `2019`:`2000_2019`)
+full_percent_wide <- full_percent %>% pivot_wider(GEOID, names_from = variable, values_from = `2019`:`2000_2019`)
 
 write_rds(full %>% filter(substr(GEOID, 1, 5) == "17031"), "~/Git/variables_and_functions/data/output/decades.rds")
 write_rds(full_percent %>% filter(substr(GEOID, 1, 5) == "17031"), "~/Git/variables_and_functions/data/output/decades_percent.rds")
