@@ -4,12 +4,16 @@
 # edits: tim thomas - 2022.05.31
 # ==========================================================================
 
+source("~/git/timathomas/functions/functions.r")
+ipak_gh(c("jalvesaq/colorout"))
 
-library(httr)
-library(jsonlite)
-library(yaml)
-library(readxl)
-library(stringr)
+library("httr")
+library("jsonlite")
+library("yaml")
+library("readxl")
+library("stringr")
+library("tidyverse")
+
 select <- dplyr::select
 hud <- 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjFiMDE2Mzk5YTUwOGVlYTg0MzZjNmViYjVmNGUzNzI2NWM0Nzg2N2U3MDM3NDQxNTE0YjYxMTk4ODgxN2NlMDk2YzEzNDdkODE4YzI5NGNjIn0.eyJhdWQiOiI2IiwianRpIjoiMWIwMTYzOTlhNTA4ZWVhODQzNmM2ZWJiNWY0ZTM3MjY1YzQ3ODY3ZTcwMzc0NDE1MTRiNjExOTg4ODE3Y2UwOTZjMTM0N2Q4MThjMjk0Y2MiLCJpYXQiOjE2NTQwMjI5ODQsIm5iZiI6MTY1NDAyMjk4NCwiZXhwIjoxOTY5NjQyMTg0LCJzdWIiOiIzNDIyMyIsInNjb3BlcyI6W119.PvMaDKLz59cV0MxSZhS7JEoQAftYdL0SPcBKc3TViNYyHuJei4biZDJLRw4Xb-VIVwbWl2pY8wq3438QZbkGtQ'
 census <- '4c26aa6ebbaef54a55d3903212eabbb506ade381'
@@ -21,7 +25,7 @@ pull <- GET("https://www.huduser.gov/hudapi/public/fmr/listMetroAreas",
 metro_areas <- as.data.frame(fromJSON(content(pull,type="text")), stringsAsFactors = FALSE)
   
 pull_fmr <- function(name, metro_code){
-  for(year in 2017:2021){
+  for(year in 2017:2023){
     pull <- GET(paste0("https://www.huduser.gov/hudapi/public/fmr/data/", metro_code, "?year=", year),
                 config = add_headers(Authorization = paste("Bearer", hud)))
     fmr <- as.data.frame(fromJSON(content(pull,type="text"))$data$basicdata, stringsAsFactors = FALSE) %>%
@@ -37,7 +41,7 @@ pull_fmr <- function(name, metro_code){
 }
 
 pull_state_fmr <- function(name, state_code, metro_code){
-  for(year in 2017:2021){
+  for(year in 2017:2023){
     pull <- GET(paste0("https://www.huduser.gov/hudapi/public/fmr/statedata/", state_code, "?year=", year),
                 config = add_headers(Authorization = paste("Bearer", hud)))
     fmr <- as.data.frame(fromJSON(content(pull,type="text"))$data$metroareas, stringsAsFactors = FALSE) %>%
@@ -170,7 +174,7 @@ ggplot(data = output) +
     geom_line(aes(x = Year, y = fmr2, group = Metro, color = Metro)) +
     scale_color_manual(values = c("blue", "blue", "blue", "red", "red", "red", "green", "orange", "orange", "purple", "purple")) +
     scale_y_continuous("Fair Market Rent (2BR)", labels = scales::dollar) +
-    scale_x_continuous(breaks=c(2002:2021)) +
+    scale_x_continuous(breaks=c(2002:2023)) +
   ggtitle("2BR Fair Market Rents") +
     theme(plot.title = element_text(hjust = 0.5),
           axis.text.x = element_text(angle = -45, hjust = 0),
@@ -184,7 +188,7 @@ plot_metro <- function(metro){
   geom_line(aes(x = Year, y = Rent, group = Size, color = Size)) +
   scale_color_discrete(labels = c("Studio", "One Bedroom", "Two Bedroom", "Three Bedroom", "Four Bedroom")) +
   scale_y_continuous("Fair Market Rent", labels = scales::dollar) +
-  scale_x_continuous(breaks=c(2002:2021)) +
+  scale_x_continuous(breaks=c(2002:2023)) +
     ggtitle(paste(metro, "FMR Area")) +
   theme(plot.title = element_text(hjust = 0.5),
         axis.text.x = element_text(angle = -45, hjust = 0.5),
@@ -205,12 +209,12 @@ plot_metro("Brockton")
 plot_metro("Lawrence")
 #+
     #annotate("text",
-    #         x = 2021,
+    #         x = 2023,
     #         y = output %>%
-    #           filter(year == 2021) %>%
+    #           filter(year == 2023) %>%
     #           pull(fmr2) * .98,
     #         label = paste0(output %>%
-    #                          filter(year == 2021) %>%
+    #                          filter(year == 2023) %>%
     #                          pull(rb30_prop), "%")) +
     ##annotate("text",
     #         x = 2007,
